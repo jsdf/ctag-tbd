@@ -1,0 +1,182 @@
+[
+ {
+  "id": "GDVerb",
+  "name": "Plate Reverb",
+  "isStereo": true,
+  "hint": "Griesinger plate reverb according to D'Attoro, adapted from freesound3"
+ },
+ {
+  "id": "BCSR",
+  "name": "Crushendo",
+  "isStereo": false,
+  "hint": "Bit crushing and sample rate reducing"
+ },
+ {
+  "id": "Hihat1",
+  "name": "Hihat 1",
+  "isStereo": false,
+  "hint": "Hihat generator based on noise shaping"
+ },
+ {
+  "id": "MIPShft",
+  "name": "MIPShft",
+  "isStereo": true,
+  "hint": "Pitch shifter based on mutable instruments implementation"
+ },
+ {
+  "id": "TBDaits",
+  "name": "TBDaits",
+  "isStereo": true,
+  "hint": "Mutable Instruments Plaits Port"
+ },
+ {
+  "id": "CDelay",
+  "name": "CDelay",
+  "isStereo": true,
+  "hint": "Modified Cocoa Delay by tesselode"
+ },
+ {
+  "id": "SubSynth",
+  "name": "Sub Synth",
+  "isStereo": false,
+  "hint": "This plugin is inspired by Paul Nasca's zynaddsubfx sub synth. It takes noise and shapes it through a cascade of bandpass filters."
+ },
+ {
+  "id": "TBDeep",
+  "name": "TBDeeps",
+  "isStereo": true,
+  "hint": "Port of mutable instruments sheep"
+ },
+ {
+  "id": "SineSrc",
+  "name": "Sine Source",
+  "isStereo": false,
+  "hint": "Sine generator with shaping, good also for drums and fat drum and bass"
+ },
+ {
+  "id": "FVerb",
+  "name": "Freeverb",
+  "isStereo": true,
+  "hint": "The original freeverb by Jezar"
+ },
+ {
+  "id": "MIDifu",
+  "name": "MIDifu",
+  "isStereo": false,
+  "hint": "Diffuser adopted from mutable instruments"
+ },
+ {
+  "id": "EChorus",
+  "name": "\u0000\u0000\u0000\u0000\u0000\n\u0005\u001Cÿ\u000F\u0000\u0000\u0000\u0000\u0000",
+  "isStereo": true,
+  "hint": "This is an ensemble chorus effect"
+ },
+ {
+  "id": "GDVerb2",
+  "name": "Progen Reverb",
+  "isStereo": true,
+  "hint": "Griesinger progenitor reverb according to D'Attoro, adapted from freesound3"
+ },
+ {
+  "id": "MIVerb2",
+  "name": "MIVerb2",
+  "isStereo": true,
+  "hint": "Griesinger Topology Reverb based on Oliverb implementation"
+ },
+ {
+  "id": "GVerb",
+  "name": "G-Verb",
+  "isStereo": true,
+  "hint": "G-verb feedback delay network based reverb, by Juhana Sadeharju"
+ },
+ {
+  "id": "TBDings",
+  "name": "TBDings",
+  "isStereo": true,
+  "hint": "Mutable Instruments Rings Port"
+ },
+ {
+  "id": "DLoop",
+  "name": "Dust Loop",
+  "isStereo": true,
+  "hint": "This plugin simulates pops / crackles in a looping style"
+ },
+ {
+  "id": "StrampDly",
+  "name": "SDelay",
+  "isStereo": true,
+  "hint": "Delay algorithm from the CTAG StrÃ¤mpler module"
+ },
+ {
+  "id": "FBDlyLine",
+  "name": "FB Dly Line",
+  "isStereo": false,
+  "hint": "Simple delay line"
+ },
+ {
+  "id": "MacOsc",
+  "name": "MacOsc",
+  "isStereo": false,
+  "hint": "Adaptation of mutable braids"
+ },
+ {
+  "id": "PNoise",
+  "name": "Pink Noise",
+  "isStereo": false,
+  "hint": "Pink noise generator"
+ },
+ {
+  "id": "TBD03",
+  "name": "TBD03",
+  "isStereo": false,
+  "hint": "TB303 Emulation"
+ },
+ {
+  "id": "MIVerb",
+  "name": "MIVerb",
+  "isStereo": true,
+  "hint": "Griesinger Topology Reverb based on Mutable Instruments implementation"
+ },
+ {
+  "id": "PolyPad",
+  "name": "PolyPad",
+  "isStereo": false,
+  "hint": "PolyPad Synthesizer"
+ },
+ {
+  "id": "Dust",
+  "name": "Dust",
+  "isStereo": false,
+  "hint": "Dust simulation, adapted from supercolliders dust"
+ },
+ {
+  "id": "MoogFilt",
+  "name": "MoogFilters",
+  "isStereo": false,
+  "hint": "Emulation of Moog ladder filters"
+ },
+ {
+  "id": "SimpleVCA",
+  "name": "Simple VCA",
+  "isStereo": false,
+  "hint": "A Simple VCA"
+ },
+ {
+  "id": "MISVF",
+  "name": "MISVF",
+  "isStereo": false,
+  "hint": "Adaptation of Mutable Braids SVF"
+ },
+ {
+  "id": "MIChorus",
+  "name": "MIChorus",
+  "isStereo": true,
+  "hint": "Chorus based on mutable instruments"
+ },
+ {
+  "id": "MIEnsemble",
+  "name": "MIEnsemble",
+  "isStereo": true,
+  "hint": "Ensemble effect of mutable instruments"
+ }
+]

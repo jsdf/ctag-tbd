@@ -1,0 +1,37 @@
+{
+  "id": "EChorus",
+  "isStereo": true,
+  "name": "EChorus",
+  "hint": "This is an ensemble chorus effect",
+  "params": [
+    {
+      "id": "bypass",
+      "name": "Bypass",
+      "type": "bool"
+    },
+    {
+      "id": "pdepth",
+      "name": "Depth",
+      "type": "int",
+      "min": 0,
+      "max": 4095,
+      "step": 1
+    },
+    {
+      "id": "prate",
+      "name": "Rate",
+      "type": "int",
+      "min": 0,
+      "max": 4095,
+      "step": 1
+    },
+    {
+      "id": "pwet",
+      "name": "Wet",
+      "type": "int",
+      "min": 0,
+      "max": 4095,
+      "step": 1
+    }
+  ]
+}

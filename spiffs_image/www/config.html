@@ -5,6 +5,11 @@
         </div>
         <div class="center">TBD Setup</div>
     </ons-toolbar>
+    <ons-list-header>WebMidi Input Device</ons-list-header>
+    <ons-list-item>
+        <ons-select select-id="web-midi-in-devices">
+        </ons-select>
+    </ons-list-item>
     <ons-list-header>CV0 Config</ons-list-header>
     <ons-list-item>
         <ons-select id="cv0-config">
@@ -177,6 +182,11 @@
     </ons-modal>
     <script>
         ons.getScriptPage().onInit = function () {
+
+            WebMidi.inputs.forEach((el, i) =>{
+                $('#web-midi-in-devices').append('<option value="midi-device' + i + '">'+ el.name + '</option>');
+            });
+
             $.getq('myq', 'api/v1/getConfiguration',
                 data => {
                     $('#cv0-config').val(data["cv_ch0"]);

@@ -25,7 +25,7 @@
                 case 'int':
                     // render UI
                     s = '<ons-list-item>' +
-                        '<div title="' + (el.hasOwnProperty('hint') ? el.hint : '') + '" style="width: 30%;">' +
+                        '<div title="' + (el.hasOwnProperty('hint') ? el.hint : '') + '" style="width: 30%;" id="ti-' + el.id + '">' +
                         el.name +
                         '</div>' +
                         '<div style="width: 10%;">' +
@@ -68,6 +68,13 @@
                             );
                             // update view input element
                             $('#ip-' + event.data.el.id).val($('#sl-' + event.data.el.id).val());
+                        }
+                    );
+                    // title
+                    $('#ti-' + el.id).on('click', {ch: ch, el: el}, // send only when interaction done
+                        //event => {console.log(event.data.id + $('#sl-' + event.data.id).val())}
+                        event => {
+                            console.log(event);
                         }
                     );
                     // attach event listener number input

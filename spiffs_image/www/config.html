@@ -7,7 +7,8 @@
     </ons-toolbar>
     <ons-list-header>WebMidi Input Device</ons-list-header>
     <ons-list-item>
-        <ons-select select-id="web-midi-in-devices">
+        <ons-select id="midi-device" select-id="web-midi-in-devices">
+            <option value="0">None</option>
         </ons-select>
     </ons-list-item>
     <ons-list-header>CV0 Config</ons-list-header>
@@ -182,11 +183,36 @@
     </ons-modal>
     <script>
         ons.getScriptPage().onInit = function () {
-
-            WebMidi.inputs.forEach((el, i) =>{
-                $('#web-midi-in-devices').append('<option value="midi-device' + i + '">'+ el.name + '</option>');
+            // midi stuff, see also index.html JS
+            if(midiCtrl.devices != undefined){
+                console.log(midiCtrl.devices.inputs);
+                midiCtrl.devices.inputs.forEach( el =>{
+                    $('#web-midi-in-devices').append('<option value="' + el.id + '">'+ el.name + '</option>');
+                });
+            }
+            // selects last data stored on cookie
+            $('#midi-device').val(midiCtrl.actMidiInDevID);
+            $('#midi-device').on('change', el => {
+                // get selected midi controller
+                let actMidiInDevID = $('#midi-device').val();
+                if(midiCtrl.actMidiInDev){
+                    midiCtrl.actMidiInDev.onmidimessage = null;
+                }
+                for(let i of midiCtrl.devices.inputs.values()){
+                    if(i.id == actMidiInDevID){
+                        window.midiCtrl.actMidiInDevID = actMidiInDevID;
+                        window.midiCtrl.actMidiInDev = i;
+                        window.midiCtrl.actMidiInDev.onmidimessage = processMidiEvent;
+                        break;
+                    }else{
+                        window.midiCtrl.actMidiInDevID = 0;
+                        window.midiCtrl.actMidiInDev = undefined;
+                    }
+                }
+                setCookie('midi-in', midiCtrl.actMidiInDevID.toString(), 365);
             });
 
+            // dynamic REST stuff
             $.getq('myq', 'api/v1/getConfiguration',
                 data => {
                     $('#cv0-config').val(data["cv_ch0"]);

@@ -36,5 +36,66 @@ respective component folders / files if different from this license.
 <body>
 <ons-navigator swipeable id="myNavigator" page="main.html"></ons-navigator>
 </ons-navigator>
+<script>
+    // Utils
+    function setCookie(name,value,days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+    }
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    }
+    function eraseCookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    // Midi stuff
+    if (navigator.requestMIDIAccess) {
+        navigator.requestMIDIAccess({
+            sysex: false
+        }).then( m =>{
+                // get input devices and store in global object
+                window.midiCtrl = {};
+                window.midiCtrl.devices = m;
+                // check if cookie for settings exist and select current item if device exists
+                let actMidiInDevID = getCookie('midi-in');
+                window.midiCtrl.actMidiInDevID = 0;
+                if(actMidiInDevID){
+                    for(let i of midiCtrl.devices.inputs.values()){
+                        if(i.id == actMidiInDevID){
+                            window.midiCtrl.actMidiInDevID = actMidiInDevID;
+                            window.midiCtrl.actMidiInDev = i;
+                            break;
+                        }
+                    }
+                }
+                // not found?
+                if(window.midiCtrl.actMidiInDevID == 0){
+                    setCookie('midi-in', '0', 365);
+                }else{// otherwise register handler
+                    window.midiCtrl.actMidiInDev.onmidimessage = processMidiEvent;
+                }
+            }
+            , (err) => {
+                console.log(err);
+            });
+    } else {
+        console.warn("No MIDI support in your browser");
+    }
+    function processMidiEvent( event ) {
+        console.log(event);
+    }
+</script>
 </body>
 </html>

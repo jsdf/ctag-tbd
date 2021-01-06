@@ -2,10 +2,9 @@
 // init midi devices, get access
 if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess({
-        sysex: false
+        sysex: true
     }).then(m => {
             // get input devices and store in global object
-            midiCtrl = {};
             midiCtrl.devices = m;
             // check if cookie for settings exist and select current item if device exists
             let actMidiInDevID = getCookie('midi-in');
@@ -32,10 +31,12 @@ if (navigator.requestMIDIAccess) {
         });
 } else {
     console.warn("No MIDI support in your browser");
+    bindMidiMethods();
 }
 
 // midi methods bound to window.midiCtrl object
 function bindMidiMethods() {
+    midiCtrl = {};
     midiCtrl.selectInputDevice = (dev) =>{
         // remove listener
         if(midiCtrl.actMidiInDev){

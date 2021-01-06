@@ -24,7 +24,7 @@ if (navigator.requestMIDIAccess) {
                 setCookie('midi-in', '0', 365);
             } else {// otherwise register handler
                 bindMidiMethods();
-                window.midiCtrl.actMidiInDev.onmidimessage = processMidiEvent;
+                window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
             }
         }
         , (err) => {
@@ -34,50 +34,82 @@ if (navigator.requestMIDIAccess) {
     console.warn("No MIDI support in your browser");
 }
 
-// midi methods
+// midi methods bound to window.midiCtrl object
 function bindMidiMethods() {
+    // activates midi learn
     midiCtrl.midiLearn = (ch, el, target) => {
-        console.log('Midi learn');
-        console.log(ch);
-        console.log(el);
+        target.style.color = 'red';
         midiCtrl.learn = {ch: ch, el: el, t: target};
         window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiLearnOnMsg;
     };
+    // callback for midi message if in midi learn mode
     midiCtrl.midiLearnOnMsg = (e) => {
         let m = midiCtrl.parseMidiEvent(e);
         if (m) { // valid automatization ?
-            console.log(midiCtrl.learn);
             midiCtrl.learn.t.style.color = 'green';
             midiCtrl.midiCtrlMappings.push({filter: m, param: {ch: midiCtrl.learn.ch, el: midiCtrl.learn.el}}); // do not confuse plugin ch with midi filter ch!
-            console.log(midiCtrl.midiCtrlMappings);
         } else {
             midiCtrl.learn.t.style.color = 'inherit';
         }
         window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
         midiCtrl.learn = undefined;
     };
+    // callback for midi message, general
     midiCtrl.midiProcess = (e) => {
         let m = midiCtrl.parseMidiEvent(e);
         if (!m) return; // no valid automation event!
-
         // check if anything needs to be controlled and do control
         midiCtrl.midiCtrlMappings.forEach(el => {
             if(m.type == el.filter.type && m.ch == el.filter.ch && m.key == el.filter.key){ // found mapping for this midi event!
-                console.log('Found mapping, executing REST call!');
-                let val = Math.trunc(m.val/16384 * (el.param.el.max - el.param.el.min) + el.param.el.min); // always 14 bit scaled midi
-                console.log('value: ' + val);
-                $.getq('myq',
-                    'api/v1/setPluginParam/' + el.param.ch,
-                    {
-                        id: el.param.el.id,
-                        current: val
-                    }
-                );
+                let val = Math.trunc(m.val * (el.param.el.max - el.param.el.min) + el.param.el.min); // use int part
+                if(val>el.param.el.max) val = el.param.el.max;
+                if(val<el.param.el.min) val = el.param.el.min;
+                if(val != el.param.el.current){ // if parameter has really changed from current value, TODO check which value slider has!
+                    // set current parameter in automatization array
+                    el.param.el.current = val;
+                    // update ui if edit view is active
+                    if(midiCtrl.uiUpdateCallback) midiCtrl.uiUpdateCallback(el.param);
+                    // perform REST request to set parameter
+                    $.getq('myq',
+                        'api/v1/setPluginParam/' + el.param.ch,
+                        {
+                            id: el.param.el.id,
+                            current: val
+                        }
+                    );
+                }
             }
         });
     };
+    // remove specified midi mapping
+    midiCtrl.removeMapping = (ch, el, target) => {
+        target.style.color = 'inherit';
+        midiCtrl.learn = undefined;
+        midiCtrl.midiCtrlMappings = midiCtrl.midiCtrlMappings.filter( el2 => el2.param.ch != ch || el2.param.el.id != el.id);
+    };
+    // indicates mapping, returns true if mapping exists
+    midiCtrl.hasMidiMapping = (ch, el) => {
+        // check if mapping exists
+        if(midiCtrl.midiCtrlMappings.filter( el2 => el2.param.ch == ch && el2.param.el.id == el.id).length > 0){
+            return true;
+        };
+        return false;
+    };
+    // ui callback, called when param value changes
+    midiCtrl.uiUpdateCallback = undefined;
+    // update current parameter value in midi mapping, if automation for that parameter exists
+    midiCtrl.updateAutoValue = (ch, el, val) =>{
+        midiCtrl.midiCtrlMappings.forEach(el2 => {
+            if(el2.param.ch != ch) return;
+            if(el2.param.el.id != el.id) return;
+            el2.param.el.current = val;
+        });
+    };
+    // array of current mapping objects, each object consists of filter and params
     midiCtrl.midiCtrlMappings = [];
-    midiCtrl.learn = undefined; // this will contain the parameter to be learned if learning mode is active
+    // contains current parameter to be learned if in learn mode, otherwise undefined
+    midiCtrl.learn = undefined;
+    // parse midi event, returns object including all parsed data
     midiCtrl.parseMidiEvent = (e) => {
         // return value is undefined if no valid midi event for automation
         // otherwise {type, midiCh, key, value (always 14bit scaled)}
@@ -85,73 +117,34 @@ function bindMidiMethods() {
         switch (e.data[0] & 0xf0) {
             case 0x90:
                 if (e.data[2] != 0) {  // if velocity != 0, this is a note-on message
-                    console.log('Note on');
-                    break;
+                    //console.log('Note on');
+                    return {type: 'n', ch: midiChannel, key: e.data[1], val: e.data[2]/127};
                 }
             // if velocity == 0, fall thru: it's a note-off.  MIDI's weird, y'all.
             case 0x80:
-                console.log('Note off');
-                break;
+                //console.log('Note off');
+                return {type: 'n', ch: midiChannel, key: e.data[1], val: e.data[2]/127};
             case 0xa0:
-                console.log('Poly Key Pressure value: ');
+                //.log('Poly Key Pressure value: ');
                 break;
             case 0xB0:
-                console.log('Controller: ' + e.data[1] + ' value: ' + e.data[2]);
-                return {type: 'c', ch: midiChannel, key: e.data[1], val: e.data[2]<<7};
+                //.log('Controller: ' + e.data[1] + ' value: ' + e.data[2]);
+                return {type: 'c', ch: midiChannel, key: e.data[1], val: e.data[2]/127};
             case 0xC0:
-                console.log('Program change');
+                //.log('Program change');
                 break;
             case 0xD0:
-                console.log('Channel pressure');
+                //console.log('Channel pressure');
                 break;
             case 0xE0:
-                console.log('Pitch bend value: ' + (e.data[1] + (e.data[2] << 7)));
-                return {type: 'p', ch: midiChannel, key: 0, val: (e.data[1] + (e.data[2] << 7))};
+                //console.log('Pitch bend value: ' + (e.data[1] + (e.data[2] << 7)));
+                return {type: 'p', ch: midiChannel, key: 0, val: (e.data[1] + (e.data[2] << 7))/16384};
             case 0xF0:
-                console.log('Sysx');
+                //console.log('Sysx');
                 break;
             default:
                 break;
         }
         return undefined;
-    }
-}
-
-
-// process and list midi events
-function processMidiEvent(event) {
-    // parse event
-    let midiChannel = event.data[0] & 0x0F;
-    console.log('Midi Channel' + midiChannel);
-    switch (event.data[0] & 0xf0) {
-        case 0x90:
-            if (event.data[2] != 0) {  // if velocity != 0, this is a note-on message
-                console.log('Note on');
-                break;
-            }
-        // if velocity == 0, fall thru: it's a note-off.  MIDI's weird, y'all.
-        case 0x80:
-            console.log('Note off');
-            break;
-        case 0xa0:
-            console.log('Poly Key Pressure value: ');
-            break;
-        case 0xB0:
-            console.log('Controller: ' + event.data[1] + ' value: ' + event.data[2]);
-            break;
-        case 0xC0:
-            console.log('Program change');
-            break;
-        case 0xD0:
-            console.log('Channel pressure');
-            break;
-        case 0xE0:
-            console.log('Pitch bend value: ' + (event.data[1] + (event.data[2] << 7)));
-            break;
-        case 0xF0:
-            console.log('Sysx');
-            break;
-        default:
-            break;
     }
 }

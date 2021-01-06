@@ -56,18 +56,19 @@
                     }
                     // attach event listener slider
                     $('#sl-' + el.id).on('input', {ch: ch, el: el}, // send only when interaction done
-                        //event => {console.log(event.data.id + $('#sl-' + event.data.id).val())}
                         event => {
+                            let val = $('#sl-' + event.data.el.id).val();
+                            midiCtrl.updateAutoValue(event.data.ch, event.data.el, val);
                             // rest request to backend
                             $.getq('myq',
                                 'api/v1/setPluginParam/' + event.data.ch,
                                 {
                                     id: event.data.el.id,
-                                    current: $('#sl-' + event.data.el.id).val()
+                                    current: val
                                 }
                             );
                             // update view input element
-                            $('#ip-' + event.data.el.id).val($('#sl-' + event.data.el.id).val());
+                            $('#ip-' + event.data.el.id).val(val);
                         }
                     );
                     // attach event listener number input
@@ -85,6 +86,7 @@
                                 value = event.data.el.min;
                                 $('#ip-' + event.data.el.id).val(value);
                             }
+                            midiCtrl.updateAutoValue(event.data.ch, event.data.el, value);
                             $.getq('myq',
                                 'api/v1/setPluginParam/' + event.data.ch,
                                 {
@@ -119,18 +121,18 @@
                                 console.log(event);
                                 if(!midiCtrl.learn){
                                     midiCtrl.midiLearn(ch, event.data.el, target);
-                                    target.style.color = 'red';
                                 }
                             }
                             // delete midi automation
                             if(event.altKey && event.shiftKey){
-                                console.log('Delete midi automation');
-                                target.style.color = 'inherit';
-                                midiCtrl.learn = undefined;
-                                // TODO remove midiLearn if currently active, remove learned midi from automatization array
+                                midiCtrl.removeMapping(ch, event.data.el, target);
                             }
                         }
                     );
+                    // check if midi mapping exists
+                    if(midiCtrl.hasMidiMapping(ch, el)){
+                        $('#ti-' + el.id).css('color', 'green');
+                    }
                     break;
                 case 'bool':
                     // render UI
@@ -190,6 +192,7 @@
         }
 
         ons.getScriptPage().onInit = function () {
+            let activeChannel = this.data.ch;
             this.querySelector('ons-toolbar .center').innerHTML = 'CHANNEL ' + this.data.ch;
 
             $.getq('myq',
@@ -204,7 +207,25 @@
 
             this.onShow = function () {
                 //console.log('Setup show');
+                // register midi automatization ui update callback
+                midiCtrl.uiUpdateCallback = updateUiOnMidi;
+                function updateUiOnMidi(param){
+                    if(activeChannel != param.ch) return;
+                    switch(param.el.type){
+                        case 'int':
+                            $('#sl-' + param.el.id).val(param.el.current);
+                            $('#ip-' + param.el.id).val(param.el.current);
+                            break;
+                        case 'bool':
+                            break;
+                    }
+                }
             };
+            this.onHide = function () {
+                //console.log('hide');
+                // deregister midi auto callback
+                midiCtrl.uiUpdateCallback = undefined;
+            }
         };
     </script>
 </ons-page>

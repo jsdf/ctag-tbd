@@ -70,13 +70,6 @@
                             $('#ip-' + event.data.el.id).val($('#sl-' + event.data.el.id).val());
                         }
                     );
-                    // title
-                    $('#ti-' + el.id).on('click', {ch: ch, el: el}, // send only when interaction done
-                        //event => {console.log(event.data.id + $('#sl-' + event.data.id).val())}
-                        event => {
-                            console.log(event);
-                        }
-                    );
                     // attach event listener number input
                     $('#ip-' + el.id).on('input', {ch: ch, el: el},
                         //event => {console.log(event.data.id + $('#sl-' + event.data.id).val())}
@@ -117,6 +110,27 @@
                             }
                         );
                     }
+                    // attach midi learn event listener to param name title
+                    $('#ti-' + el.id).on('click', {ch: ch, el: el},
+                        event => {
+                            let target = event.target;
+                            // midi learn
+                            if(event.altKey && !event.shiftKey){
+                                console.log(event);
+                                if(!midiCtrl.learn){
+                                    midiCtrl.midiLearn(ch, event.data.el, target);
+                                    target.style.color = 'red';
+                                }
+                            }
+                            // delete midi automation
+                            if(event.altKey && event.shiftKey){
+                                console.log('Delete midi automation');
+                                target.style.color = 'inherit';
+                                midiCtrl.learn = undefined;
+                                // TODO remove midiLearn if currently active, remove learned midi from automatization array
+                            }
+                        }
+                    );
                     break;
                 case 'bool':
                     // render UI

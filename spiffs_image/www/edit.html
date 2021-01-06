@@ -210,6 +210,7 @@
                 //console.log('Setup show');
                 // register midi automatization ui update callback
                 midiCtrl.uiUpdateCallback = updateUiOnMidi;
+                // update callback
                 function updateUiOnMidi(param){
                     if(activeChannel != param.ch) return;
                     switch(param.el.type){
@@ -218,7 +219,6 @@
                             $('#ip-' + param.el.id).val(param.el.current);
                             break;
                         case 'bool':
-                            console.log(param.el.current);
                             $('#sw-' + param.el.id).prop('checked', param.el.current == 1 ? true : false);
                             break;
                     }

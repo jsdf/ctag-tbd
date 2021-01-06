@@ -91,7 +91,7 @@ function bindMidiMethods() {
                 if(m.type == 'c' || m.type == 'p'){
                     switch(el.param.el.type){
                         case 'int':{
-                            let val = Math.trunc(m.val * (el.param.el.max - el.param.el.min) + el.param.el.min); // use int part
+                            let val = Math.round(m.val * (el.param.el.max - el.param.el.min) + el.param.el.min); // use int part
                             if(val>el.param.el.max) val = el.param.el.max;
                             if(val<el.param.el.min) val = el.param.el.min;
                             if(val != el.param.el.current){ // if parameter has really changed from current value, TODO check which value slider has!

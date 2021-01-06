@@ -265,12 +265,25 @@ esp_err_t RestServer::StartRestServer() {
     strlcpy(rest_context->base_path, base_path, sizeof(rest_context->base_path));
 
     httpd_handle_t server = NULL;
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    config.core_id = 0;
-    config.uri_match_fn = httpd_uri_match_wildcard;
-    config.task_priority = tskIDLE_PRIORITY + 3;
-    config.max_uri_handlers = 20;
-    config.stack_size = 8192;
+    httpd_ssl_config_t conf = HTTPD_SSL_CONFIG_DEFAULT();
+
+    extern const unsigned char cacert_pem_start[] asm("_binary_cacert_pem_start");
+    extern const unsigned char cacert_pem_end[]   asm("_binary_cacert_pem_end");
+    conf.cacert_pem = cacert_pem_start;
+    conf.cacert_len = cacert_pem_end - cacert_pem_start;
+
+    extern const unsigned char prvtkey_pem_start[] asm("_binary_prvtkey_pem_start");
+    extern const unsigned char prvtkey_pem_end[]   asm("_binary_prvtkey_pem_end");
+    conf.prvtkey_pem = prvtkey_pem_start;
+    conf.prvtkey_len = prvtkey_pem_end - prvtkey_pem_start;
+
+
+    httpd_config_t *config = &conf.httpd;
+    config->core_id = 0;
+    config->uri_match_fn = httpd_uri_match_wildcard;
+    config->task_priority = tskIDLE_PRIORITY + 3;
+    config->max_uri_handlers = 20;
+    config->stack_size = 8192;
     /*
     config.max_open_sockets   = 10;
     config.max_resp_headers   = 10;
@@ -303,8 +316,11 @@ esp_err_t RestServer::StartRestServer() {
 }
 */
     ESP_LOGI(REST_TAG, "Starting HTTP Server");
-    if (httpd_start(&server, &config) != ESP_OK)
+    if (httpd_ssl_start(&server, &conf) != ESP_OK){
+        ESP_LOGE("REST", "ERROR STARTING SERVER!");
         return ESP_FAIL;
+    }
+
     /*
       httpd_uri_t system_info_get_uri = {
           .uri = "/api/v1/system/info",

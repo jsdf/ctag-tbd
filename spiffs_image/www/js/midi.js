@@ -1,8 +1,21 @@
 // Midi stuff
+// bind dummies
+midiCtrl = {};
+midiCtrl.selectInputDevice = () => {};
+midiCtrl.midiLearn = () => {};
+midiCtrl.midiLearnOnMsg = () => {};
+midiCtrl.midiProcess = () => {};
+midiCtrl.removeMapping = () => {};
+midiCtrl.hasMidiMapping = () => {};
+midiCtrl.uiUpdateCallback = () => {};
+midiCtrl.midiCtrlMappings = [];
+midiCtrl.parseMidiEvent = () => {};
+midiCtrl.updateAutoValue = () => {};
+
 // init midi devices, get access
 if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess({
-        sysex: true
+        sysex: false
     }).then(m => {
             // get input devices and store in global object
             midiCtrl.devices = m;
@@ -31,12 +44,10 @@ if (navigator.requestMIDIAccess) {
         });
 } else {
     console.warn("No MIDI support in your browser");
-    bindMidiMethods();
 }
 
 // midi methods bound to window.midiCtrl object
 function bindMidiMethods() {
-    midiCtrl = {};
     midiCtrl.selectInputDevice = (dev) =>{
         // remove listener
         if(midiCtrl.actMidiInDev){
@@ -74,7 +85,6 @@ function bindMidiMethods() {
             // remove value as we only need key
             delete m.val;
             midiCtrl.midiCtrlMappings.push({filter: m, param: {ch: midiCtrl.learn.ch, el: midiCtrl.learn.el}}); // do not confuse plugin ch with midi filter ch!
-            console.log(midiCtrl.midiCtrlMappings);
         } else {
             midiCtrl.learn.t.style.color = 'inherit';
         }

@@ -142,7 +142,6 @@
                     $('#sw-' + el.id).on('change', {ch: ch, el: el},
                         //event => {console.log(event.data.el.id + $('#sw-' + event.data.el.id).prop('checked')
                         event => {
-                        console.log('Fired change event to REST');
                         $.getq('myq',
                             'api/v1/setPluginParam/' + event.data.ch,
                             {
@@ -175,7 +174,6 @@
                     let target = event.target;
                     // midi learn
                     if(event.altKey && !event.shiftKey){
-                        console.log(event);
                         if(!midiCtrl.learn){
                             midiCtrl.midiLearn(ch, event.data.el, target);
                         }

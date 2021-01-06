@@ -112,33 +112,11 @@
                             }
                         );
                     }
-                    // attach midi learn event listener to param name title
-                    $('#ti-' + el.id).on('click', {ch: ch, el: el},
-                        event => {
-                            let target = event.target;
-                            // midi learn
-                            if(event.altKey && !event.shiftKey){
-                                console.log(event);
-                                if(!midiCtrl.learn){
-                                    midiCtrl.midiLearn(ch, event.data.el, target);
-                                }
-                            }
-                            // delete midi automation
-                            if(event.altKey && event.shiftKey){
-                                midiCtrl.removeMapping(ch, event.data.el, target);
-                            }
-                        }
-                    );
-                    // check if midi mapping exists
-                    if(midiCtrl.hasMidiMapping(ch, el)){
-                        $('#ti-' + el.id).css('color', 'green');
-                    }
                     break;
                 case 'bool':
                     // render UI
                     s = '<ons-list-item>' +
-                        '<div title="' + (el.hasOwnProperty('hint') ? el.hint : '') + '" style="width: 40%;">' +
-                        el.name +
+                        '<div title="' + (el.hasOwnProperty('hint') ? el.hint : '') + '" style="width: 40%;" id="ti-' + el.id + '">' + el.name +
                         '</div>' +
                         '<div style="width: 50%;">' +
                         '<ons-switch id="sw-' + el.id + '"' + (el.current == 1 ? 'checked' : '') + '></ons-switch>' +
@@ -163,13 +141,15 @@
                     // attach event listener
                     $('#sw-' + el.id).on('change', {ch: ch, el: el},
                         //event => {console.log(event.data.el.id + $('#sw-' + event.data.el.id).prop('checked')
-                        event => $.getq('myq',
+                        event => {
+                        console.log('Fired change event to REST');
+                        $.getq('myq',
                             'api/v1/setPluginParam/' + event.data.ch,
                             {
                                 id: event.data.el.id,
                                 current: ($('#sw-' + event.data.el.id).prop('checked') ? 1 : 0)
                             }
-                        )
+                        )}
                     );
                     // attach event listener to select trig
                     if (el.hasOwnProperty('trig')) {
@@ -188,6 +168,27 @@
                 default:
                     //console.log('Unknown parameter type, ignoring!');
                     break;
+            }
+            // attach midi learn event listener to param name title
+            $('#ti-' + el.id).on('click', {ch: ch, el: el},
+                event => {
+                    let target = event.target;
+                    // midi learn
+                    if(event.altKey && !event.shiftKey){
+                        console.log(event);
+                        if(!midiCtrl.learn){
+                            midiCtrl.midiLearn(ch, event.data.el, target);
+                        }
+                    }
+                    // delete midi automation
+                    if(event.altKey && event.shiftKey){
+                        midiCtrl.removeMapping(ch, event.data.el, target);
+                    }
+                }
+            );
+            // check if midi mapping exists
+            if(midiCtrl.hasMidiMapping(ch, el)){
+                $('#ti-' + el.id).css('color', 'green');
             }
         }
 
@@ -217,6 +218,8 @@
                             $('#ip-' + param.el.id).val(param.el.current);
                             break;
                         case 'bool':
+                            console.log(param.el.current);
+                            $('#sw-' + param.el.id).prop('checked', param.el.current == 1 ? true : false);
                             break;
                     }
                 }

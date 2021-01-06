@@ -5,25 +5,25 @@ if (navigator.requestMIDIAccess) {
         sysex: false
     }).then(m => {
             // get input devices and store in global object
-            window.midiCtrl = {};
-            window.midiCtrl.devices = m;
+            midiCtrl = {};
+            midiCtrl.devices = m;
             // check if cookie for settings exist and select current item if device exists
             let actMidiInDevID = getCookie('midi-in');
-            window.midiCtrl.actMidiInDevID = 0;
+            midiCtrl.actMidiInDevID = 0;
             if (actMidiInDevID) {
                 for (let i of midiCtrl.devices.inputs.values()) {
                     if (i.id == actMidiInDevID) {
-                        window.midiCtrl.actMidiInDevID = actMidiInDevID;
-                        window.midiCtrl.actMidiInDev = i;
+                        midiCtrl.actMidiInDevID = actMidiInDevID;
+                        midiCtrl.actMidiInDev = i;
                         break;
                     }
                 }
             }
             // not found?
-            if (window.midiCtrl.actMidiInDevID == 0) {
+            if (midiCtrl.actMidiInDevID == 0) {
                 setCookie('midi-in', '0', 365);
             } else {// otherwise register handler
-                window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
+                midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
             }
             bindMidiMethods();
         }
@@ -58,21 +58,26 @@ function bindMidiMethods() {
     };
     // activates midi learn
     midiCtrl.midiLearn = (ch, el, target) => {
-        if(!window.midiCtrl.actMidiInDevID) return; // no active dev
+        if(!midiCtrl.actMidiInDevID) return; // no active dev
+        // remove old mapping if it exists
+        midiCtrl.removeMapping(ch, el, target);
         target.style.color = 'red';
         midiCtrl.learn = {ch: ch, el: el, t: target};
-        window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiLearnOnMsg;
+        midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiLearnOnMsg;
     };
     // callback for midi message if in midi learn mode
     midiCtrl.midiLearnOnMsg = (e) => {
         let m = midiCtrl.parseMidiEvent(e);
         if (m) { // valid automatization ?
             midiCtrl.learn.t.style.color = 'green';
+            // remove value as we only need key
+            delete m.val;
             midiCtrl.midiCtrlMappings.push({filter: m, param: {ch: midiCtrl.learn.ch, el: midiCtrl.learn.el}}); // do not confuse plugin ch with midi filter ch!
+            console.log(midiCtrl.midiCtrlMappings);
         } else {
             midiCtrl.learn.t.style.color = 'inherit';
         }
-        window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
+        midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
         midiCtrl.learn = undefined;
     };
     // callback for midi message, general
@@ -82,23 +87,51 @@ function bindMidiMethods() {
         // check if anything needs to be controlled and do control
         midiCtrl.midiCtrlMappings.forEach(el => {
             if(m.type == el.filter.type && m.ch == el.filter.ch && m.key == el.filter.key){ // found mapping for this midi event!
-                let val = Math.trunc(m.val * (el.param.el.max - el.param.el.min) + el.param.el.min); // use int part
-                if(val>el.param.el.max) val = el.param.el.max;
-                if(val<el.param.el.min) val = el.param.el.min;
-                if(val != el.param.el.current){ // if parameter has really changed from current value, TODO check which value slider has!
-                    // set current parameter in automatization array
-                    el.param.el.current = val;
-                    // update ui if edit view is active
-                    if(midiCtrl.uiUpdateCallback) midiCtrl.uiUpdateCallback(el.param);
-                    // perform REST request to set parameter
-                    $.getq('myq',
-                        'api/v1/setPluginParam/' + el.param.ch,
-                        {
-                            id: el.param.el.id,
-                            current: val
+                // parse midi control and pitch bend data
+                if(m.type == 'c' || m.type == 'p'){
+                    switch(el.param.el.type){
+                        case 'int':{
+                            let val = Math.trunc(m.val * (el.param.el.max - el.param.el.min) + el.param.el.min); // use int part
+                            if(val>el.param.el.max) val = el.param.el.max;
+                            if(val<el.param.el.min) val = el.param.el.min;
+                            if(val != el.param.el.current){ // if parameter has really changed from current value, TODO check which value slider has!
+                                // set current parameter in automatization array
+                                el.param.el.current = val;
+                                // update ui if edit view is active
+                                if(midiCtrl.uiUpdateCallback) midiCtrl.uiUpdateCallback(el.param);
+                                // perform REST request to set parameter
+                                $.getq('myq',
+                                    'api/v1/setPluginParam/' + el.param.ch,
+                                    {
+                                        id: el.param.el.id,
+                                        current: val
+                                    }
+                                );
+                            }
                         }
-                    );
+                            break;
+                        case 'bool':{
+                            // TODO maybe we need another threshold here, not sure for buttons on Midi keyboards?
+                            let val = m.val >= 0.5 ? 1 : 0; // 0.5 is threshold for on
+                            if(val != el.param.el.current){ // if parameter has really changed from current value, TODO check which value slider has!
+                                // set current parameter in automatization array
+                                el.param.el.current = val;
+                                // update ui if edit view is active
+                                if(midiCtrl.uiUpdateCallback) midiCtrl.uiUpdateCallback(el.param);
+                                // perform REST request to set parameter
+                                $.getq('myq',
+                                    'api/v1/setPluginParam/' + el.param.ch,
+                                    {
+                                        id: el.param.el.id,
+                                        current: val
+                                    }
+                                );
+                            }
+                        }
+                            break;
+                    }
                 }
+                // TODO parse other data such as note on
             }
         });
     };

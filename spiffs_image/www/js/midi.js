@@ -23,9 +23,9 @@ if (navigator.requestMIDIAccess) {
             if (window.midiCtrl.actMidiInDevID == 0) {
                 setCookie('midi-in', '0', 365);
             } else {// otherwise register handler
-                bindMidiMethods();
                 window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
             }
+            bindMidiMethods();
         }
         , (err) => {
             console.log(err);
@@ -36,8 +36,29 @@ if (navigator.requestMIDIAccess) {
 
 // midi methods bound to window.midiCtrl object
 function bindMidiMethods() {
+    midiCtrl.selectInputDevice = (dev) =>{
+        // remove listener
+        if(midiCtrl.actMidiInDev){
+            midiCtrl.actMidiInDev.onmidimessage = null;
+        }
+        // deselect in device
+        midiCtrl.actMidiInDevID = 0;
+        midiCtrl.actMidiInDev = undefined;
+        // select new device
+        for(let i of midiCtrl.devices.inputs.values()){
+            if(i.id == dev){
+                midiCtrl.actMidiInDevID = dev;
+                midiCtrl.actMidiInDev = i;
+                midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiProcess;
+                break;
+            }
+        }
+        // persist selection on cookie
+        setCookie('midi-in', midiCtrl.actMidiInDevID.toString(), 365);
+    };
     // activates midi learn
     midiCtrl.midiLearn = (ch, el, target) => {
+        if(!window.midiCtrl.actMidiInDevID) return; // no active dev
         target.style.color = 'red';
         midiCtrl.learn = {ch: ch, el: el, t: target};
         window.midiCtrl.actMidiInDev.onmidimessage = midiCtrl.midiLearnOnMsg;
@@ -89,6 +110,8 @@ function bindMidiMethods() {
     };
     // indicates mapping, returns true if mapping exists
     midiCtrl.hasMidiMapping = (ch, el) => {
+        // midi inactive ?
+        if(!midiCtrl.actMidiInDevID) return false;
         // check if mapping exists
         if(midiCtrl.midiCtrlMappings.filter( el2 => el2.param.ch == ch && el2.param.el.id == el.id).length > 0){
             return true;

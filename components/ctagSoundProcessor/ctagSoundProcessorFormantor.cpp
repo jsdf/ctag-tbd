@@ -425,8 +425,8 @@ bool b_use_fix_formants = true;
   for(uint32_t i = 0; i < bufSz; i++)
   {
     // --- Calculate all oscillators (PD, SQW & PWM) ---
-    f_val_pd = Phasedist_real_process(pd_data,0);   // The input-parameter is ignored by this VULT algorithm with the MIDI-example!
-    f_val_pd = Fold_do(f_val_pd, f_WaveFolder);   // Apply wavefolder to PD-OSC
+    f_val_pd = vult::Phasedist_real_process(pd_data,0);   // The input-parameter is ignored by this VULT algorithm with the MIDI-example!
+    f_val_pd = vult::Fold_do(f_val_pd, f_WaveFolder);   // Apply wavefolder to PD-OSC
     f_val_sqw = f_sine_tmp = oscPWM.Process();
     f_val_sqw += f_LFO_pwm*f_PWMintensity; // Add "PWM-offset"
     SINE_TO_SQUARE(f_val_sqw);  // This by nature contains a constrain, avoiding value overflow (possibly due to PWM-mechanism)!

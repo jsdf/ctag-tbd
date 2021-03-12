@@ -47,6 +47,8 @@ file(GLOB SRCS_FILES
         airwindows/*.cpp
         synthesis/*.hpp
         synthesis/*.cpp
+        vult/*.h
+        vult/*.cpp
         ${CMAKE_BINARY_DIR}/gen_include/*.hpp
         )
 

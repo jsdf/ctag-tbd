@@ -1,0 +1,115 @@
+{
+  "activePatch": 0,
+  "patches": [
+    {
+      "name": "Default",
+      "params": [
+        {
+          "id": "decay",
+          "current": 5000,
+          "cv": -1
+        },
+        {
+          "id": "room_size",
+          "current": 5000,
+          "cv": -1
+        },
+        {
+          "id": "dry",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "wet",
+          "current": 5000,
+          "cv": -1
+        },
+        {
+          "id": "diffusion",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "pre_delay",
+          "current": 0,
+          "cv": -1
+        },
+        {
+          "id": "input_low_damp",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "input_high_damp",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "reverb_low_damp",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "reverb_high_damp",
+          "current": 10000,
+          "cv": -1
+        }
+      ]
+    },
+    {
+      "name": "Lush",
+      "params": [
+        {
+          "id": "decay",
+          "current": 7500,
+          "cv": -1
+        },
+        {
+          "id": "room_size",
+          "current": 7500,
+          "cv": -1
+        },
+        {
+          "id": "dry",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "wet",
+          "current": 5000,
+          "cv": -1
+        },
+        {
+          "id": "diffusion",
+          "current": 10000,
+          "cv": -1
+        },
+        {
+          "id": "pre_delay",
+          "current": 1000,
+          "cv": -1
+        },
+        {
+          "id": "input_low_damp",
+          "current": 6000,
+          "cv": -1
+        },
+        {
+          "id": "input_high_damp",
+          "current": 9000,
+          "cv": -1
+        },
+        {
+          "id": "reverb_low_damp",
+          "current": 6000,
+          "cv": -1
+        },
+        {
+          "id": "reverb_high_damp",
+          "current": 9000,
+          "cv": -1
+        }
+      ]
+    }
+  ]
+}

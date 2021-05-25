@@ -1,0 +1,84 @@
+{
+  "id": "platverb",
+  "isStereo": true,
+  "name": "platverb",
+  "hint": "Plate reverb based on Valley Audio Plateau",
+  "params": [
+    {
+      "id": "decay",
+      "name": "Decay",
+      "hint": "Decay time",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "room_size",
+      "name": "Size",
+      "hint": "Room Size",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "dry",
+      "name": "Dry",
+      "hint": "Dry amount",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "wet",
+      "name": "Wet",
+      "hint": "Wet amount",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "diffusion",
+      "name": "Diffusion",
+      "hint": "Diffusion",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "pre_delay",
+      "name": "Pre-Delay",
+      "hint": "Pre-Delay time",
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "input_low_damp",
+      "name": "Input Low Cut", 
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "input_high_damp",
+      "name": "Input High Cut", 
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "reverb_low_damp",
+      "name": "Reverb Low Damp", 
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    },
+    {
+      "id": "reverb_high_damp",
+      "name": "Reverb High Damp", 
+      "type": "int",
+      "min": 0,
+      "max": 10000
+    } 
+  ]
+}

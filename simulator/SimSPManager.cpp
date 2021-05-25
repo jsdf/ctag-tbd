@@ -125,10 +125,13 @@ void SimSPManager::StartSoundProcessor(int iSoundCardID, string wavFile, bool bO
         std::cout << "Could not probe sound card!" << std::endl;
         exit(0);
     }
+    printf("before open wav\n");
 
     // wav file
     if (!wavFile.empty()) {
+        printf("wav not empty\n");
         tinywav_open_read(&tw, wavFile.c_str(), TW_INTERLEAVED, TW_FLOAT32);
+        printf("done reading\n");
         if (!tw.f) {
             cout << "Could not open wav file!" << endl;
             exit(-1);
@@ -142,6 +145,8 @@ void SimSPManager::StartSoundProcessor(int iSoundCardID, string wavFile, bool bO
             exit(-1);
         }
         isWaveInput = true;
+    } else {
+        printf("wav empty\n");
     }
 
     // main stuff

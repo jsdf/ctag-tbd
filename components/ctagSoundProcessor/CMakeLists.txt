@@ -49,6 +49,8 @@ file(GLOB SRCS_FILES
         synthesis/*.cpp
         vult/*.cpp
         vult/*.h
+        valley/*.cpp
+        valley/*.hpp
         ${CMAKE_BINARY_DIR}/gen_include/*.hpp
         )
 

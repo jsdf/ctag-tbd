@@ -1,5 +1,4 @@
 #include "Plateau.hpp"
-using namespace rack::math;
 
 Param::Param() {
     id = 0;
